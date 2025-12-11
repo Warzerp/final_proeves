@@ -102,10 +102,10 @@ especialista en medicina física y rehabilitación."
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                        CLIENTE WEB                          │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │    Login     │  │   Register   │  │     Chat     │      │
-│  │  (HTML/CSS)  │  │  (HTML/CSS)  │  │  (HTML/CSS)  │      │
-│  └──────────────┘  └──────────────┘  └──────────────┘      │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
+│  │    Login     │  │   Register   │  │     Chat     │       │
+│  │  (HTML/CSS)  │  │  (HTML/CSS)  │  │  (HTML/CSS)  │       │
+│  └──────────────┘  └──────────────┘  └──────────────┘       │
 │         │                  │                  │             │
 │         └──────────────────┴──────────────────┘             │
 │                            │                                │
@@ -145,7 +145,7 @@ especialista en medicina física y rehabilitación."
 │              PostgreSQL 16 + pgvector                       │
 │  ┌──────────────────────────────────────────────────────┐   │
 │  │  Schema: smart_health                                │   │
-│  │                                                       │   │
+│  │                                                      │   │
 │  │  • patients (embeddings)                             │   │
 │  │  • doctors (embeddings)                              │   │
 │  │  • appointments (embeddings)                         │   │
@@ -923,3 +923,4 @@ query = f"SELECT * FROM users WHERE email = '{user_email}'"
 **Sanitización de número de documento:**
 ```python
 def sanitize_document_number(
+
