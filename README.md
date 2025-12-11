@@ -240,25 +240,13 @@ especialista en medicina física y rehabilitación."
 
 ## 🚀 Instalación Rápida
 
-### Opción 1: Script Automatizado (Recomendado)
+### Opción 1: Clonar
 
 ```bash
 # 1. Clonar repositorio
 git clone https://github.com/Ospino89/-backend-fapi-bdi-smart_health.git
 cd -backend-fapi-bdi-smart_health
 
-# 2. Ejecutar instalador automático
-./install.sh  # Linux/Mac
-# o
-install.bat   # Windows
-
-# 3. El script realizará:
-#    - Instalación de dependencias Python
-#    - Configuración de PostgreSQL + pgvector
-#    - Creación de base de datos
-#    - Inserción de datos de ejemplo
-#    - Configuración del archivo .env
-```
 
 ### Opción 2: Docker (Próximamente)
 
@@ -1823,4 +1811,5 @@ https://github.com/Ospino89/-backend-fapi-bdi-smart_health
 - ⚡ API REST básica
 - 💾 Base de datos PostgreSQL
 - 🔐 Sistema
+
 
