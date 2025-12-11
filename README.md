@@ -1,18 +1,18 @@
 
 -----
-```markdown
-# BACKEND-FAPI-BDI-SMART_HEALTH
+
+# BACKEND-FAPI-BDI-SMART\_HEALTH
 
 # SmartHealth - Sistema de Consulta Clínica Inteligente con RAG
 
-**Desarrolladores**: Ivan Ospino, Gisell Anaya, Jhoan Smith, Jeison Mendez, Jhon Mantilla, Jhoana Inocencio, Sergio Villamizar, Jhoan Valero  
-**Versión**: 2.0.0  
+**Desarrolladores**: Ivan Ospino, Gisell Anaya, Jhoan Smith, Jeison Mendez, Jhon Mantilla, Jhoana Inocencio, Sergio Villamizar, Jhoan Valero
+**Versión**: 2.0.0
 **Creado**: 22-Noviembre-2025  
 **Última actualización**: 10-Diciembre-2025
 
 -----
 
-## Tabla de Contenidos
+## 📋 Tabla de Contenidos
 
 1. [Descripción General](#descripción-general)
 2. [Características Principales](#características-principales)
@@ -25,23 +25,20 @@
 9. [API Endpoints](#api-endpoints)
 10. [WebSocket](#websocket)
 11. [Seguridad](#seguridad)
-12. [Estructura del Proyecto](#estructura-del-proyecto)
-13. [Tecnologías Utilizadas](#tecnologías-utilizadas)
-14. [Desarrollo](#desarrollo)
-15. [Testing](#testing)
-16. [Despliegue en Producción](#despliegue-en-producción)
-17. [Monitoreo y Logs](#monitoreo-y-logs)
-18. [Troubleshooting](#troubleshooting)
-19. [Recursos Adicionales](#recursos-adicionales)
-20. [Contribución](#contribución)
-21. [Licencia](#licencia)
-22. [Agradecimientos](#agradecimientos)
-23. [Contacto](#contacto)
-24. [Changelog](#changelog)
+12. [Estructura del Proyecto](#7-estructura-del-proyecto)
+13. [Tecnologías Utilizadas](#8-tecnologías-utilizadas)
+14. [Desarrollo](#9-desarrollo)
+15. [Testing](#10-testing)
+16. [Despliegue en Producción](#11-despliegue-en-producción)
+17. [Monitoreo y Logs](#12-monitoreo-y-logs)
+18. [Troubleshooting](#13-troubleshooting)
+19. [Recursos Adicionales](#14-recursos-adicionales)
+20. [Contribución](#15-contribución)
+21. [Licencia](#16-licencia)
 
 -----
 
-## Descripción General
+##  Descripción General
 
 SmartHealth es un **sistema de consulta clínica inteligente** que utiliza **RAG (Retrieval-Augmented Generation)** para proporcionar respuestas precisas sobre historiales médicos de pacientes. El sistema combina:
 
@@ -61,26 +58,23 @@ SmartHealth es un **sistema de consulta clínica inteligente** que utiliza **RAG
 ### Caso de Uso
 
 ```
-
 Usuario: "¿Cuándo fue la última cita del paciente Juan Pérez?"
 
 Sistema:
-
-1.  Busca al paciente por documento
-2.  Realiza búsqueda vectorial en su historial
-3.  Construye contexto clínico relevante
-4.  Genera respuesta natural con GPT-4o-mini
-5.  Retorna respuesta con fuentes verificables
+1. Busca al paciente por documento
+2. Realiza búsqueda vectorial en su historial
+3. Construye contexto clínico relevante
+4. Genera respuesta natural con GPT-4o-mini
+5. Retorna respuesta con fuentes verificables
 
 Respuesta: "Juan Pérez tuvo su última cita el 9 de noviembre de 2024,
 un examen médico de chequeo general con la doctora Carolina Gutiérrez,
 especialista en medicina física y rehabilitación."
-
 ```
 
 -----
 
-## Características Principales
+## ✨ Características Principales
 
 ### Backend
 
@@ -111,12 +105,11 @@ especialista en medicina física y rehabilitación."
 
 -----
 
-## Arquitectura del Sistema
+## 🏗️ Arquitectura del Sistema
 
 ### Arquitectura General
 
 ```
-
 ┌─────────────────────────────────────────────────────────────┐
 │                        CLIENTE WEB                          │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
@@ -129,8 +122,8 @@ especialista en medicina física y rehabilitación."
 │                  JavaScript (Vanilla)                       │
 │         API Client + WebSocket + Auth Utils                 │
 └─────────────────────────────────────────────────────────────┘
-│
-▼ HTTP/HTTPS + WebSocket
+                             │
+                             ▼ HTTP/HTTPS + WebSocket
 ┌─────────────────────────────────────────────────────────────┐
 │                    BACKEND FASTAPI                          │
 │  ┌──────────────────────────────────────────────────────┐   │
@@ -156,72 +149,67 @@ especialista en medicina física y rehabilitación."
 │  │  • RAG Context Builder                               │   │
 │  └──────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
-│
-▼ SQLAlchemy
+                             │
+                             ▼ SQLAlchemy
 ┌─────────────────────────────────────────────────────────────┐
 │              PostgreSQL 16 + pgvector                       │
 │  ┌──────────────────────────────────────────────────────┐   │
-│  │  Schema: smart\_health                                │   │
+│  │  Schema: smart_health                                │   │
 │  │                                                      │   │
 │  │  • patients (embeddings)                             │   │
 │  │  • doctors (embeddings)                              │   │
 │  │  • appointments (embeddings)                         │   │
-│  │  • medical\_records (embeddings)                      │   │
+│  │  • medical_records (embeddings)                      │   │
 │  │  • diagnoses (embeddings)                            │   │
 │  │  • prescriptions                                     │   │
 │  │  • medications (embeddings)                          │   │
 │  │  • users (auth)                                      │   │
-│  │  • audit\_logs (history)                              │   │
+│  │  • audit_logs (history)                              │   │
 │  │  • + 4 tablas auxiliares                             │   │
 │  └──────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
-│
-▼
+                             │
+                             ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                      OpenAI API                             │
 │  • GPT-4o-mini (generación de respuestas)                   │
 │  • text-embedding-3-small (embeddings)                      │
 └─────────────────────────────────────────────────────────────┘
-
 ```
 
 ### Flujo RAG (Retrieval-Augmented Generation)
 
 ```
-
-1.  Usuario envía pregunta + documento de paciente
-    ↓
-2.  Backend busca paciente en PostgreSQL
-    ↓
-3.  Búsqueda vectorial: similar\_chunks (k=15, min\_score=0.3)
-    • appointments.reason\_embedding
-    • medical\_records.summary\_embedding
-    • diagnoses.description\_embedding
-    • prescriptions.medication\_embedding
-    ↓
-4.  Construcción de contexto:
-    • Información básica del paciente
-    • Citas médicas recientes
-    • Diagnósticos registrados
-    • Medicamentos prescritos
-    • Chunks relevantes de búsqueda vectorial
-    ↓
-5.  LLM genera respuesta:
-    system\_prompt + context + question → GPT-4o-mini
-    ↓
-6.  Construcción de sources (trazabilidad)
-    ↓
-7.  Respuesta JSON estructurada + metadata
-    ↓
-8.  Guardado en audit\_logs para historial
-
-<!-- end list -->
-
-````
+1. Usuario envía pregunta + documento de paciente
+   ↓
+2. Backend busca paciente en PostgreSQL
+   ↓
+3. Búsqueda vectorial: similar_chunks (k=15, min_score=0.3)
+   • appointments.reason_embedding
+   • medical_records.summary_embedding
+   • diagnoses.description_embedding
+   • prescriptions.medication_embedding
+   ↓
+4. Construcción de contexto:
+   • Información básica del paciente
+   • Citas médicas recientes
+   • Diagnósticos registrados
+   • Medicamentos prescritos
+   • Chunks relevantes de búsqueda vectorial
+   ↓
+5. LLM genera respuesta:
+   system_prompt + context + question → GPT-4o-mini
+   ↓
+6. Construcción de sources (trazabilidad)
+   ↓
+7. Respuesta JSON estructurada + metadata
+   ↓
+8. Guardado en audit_logs para historial
+```
 
 -----
 
-## Requisitos del Sistema
+## 📦 Requisitos del Sistema
 
 ### Software Requerido
 
@@ -262,15 +250,15 @@ especialista en medicina física y rehabilitación."
 
 -----
 
-## Instalación Rápida
+## 🚀 Instalación Rápida
 
 ### Opción 1: Clonar
 
 ```bash
 # 1. Clonar repositorio
-git clone [https://github.com/Ospino89/-backend-fapi-bdi-smart_health.git](https://github.com/Ospino89/-backend-fapi-bdi-smart_health.git)
+git clone https://github.com/Ospino89/-backend-fapi-bdi-smart_health.git
 cd -backend-fapi-bdi-smart_health
-````
+```
 
 ### Opción 2: Docker
 
@@ -278,13 +266,13 @@ cd -backend-fapi-bdi-smart_health
 
 -----
 
-## Instalación Detallada
+## 📚 Instalación Detallada
 
 ### Paso 1: Preparar el Entorno
 
 ```bash
 # 1. Clonar el repositorio
-git clone [https://github.com/Ospino89/-backend-fapi-bdi-smart_health.git](https://github.com/Ospino89/-backend-fapi-bdi-smart_health.git)
+git clone https://github.com/Ospino89/-backend-fapi-bdi-smart_health.git
 cd -backend-fapi-bdi-smart_health
 
 # 2. Crear entorno virtual Python
@@ -307,7 +295,7 @@ Ver guía completa en: [`backend/database_setup.md`](https://www.google.com/sear
 
 ```bash
 # 1. Instalar PostgreSQL 16
-# Windows: [https://www.postgresql.org/download/windows/](https://www.postgresql.org/download/windows/)
+# Windows: https://www.postgresql.org/download/windows/
 # Linux: sudo apt install postgresql-16
 # Mac: brew install postgresql@16
 
@@ -394,7 +382,7 @@ APP_ENV=development
 # ===================================================================
 # OPENAI API
 # ===================================================================
-# Obtener en: [https://platform.openai.com/api-keys](https://platform.openai.com/api-keys)
+# Obtener en: https://platform.openai.com/api-keys
 OPENAI_API_KEY=sk-TU_API_KEY_AQUI
 
 # ===================================================================
@@ -450,7 +438,7 @@ python -m app.services.generate_embeddings
 
 -----
 
-## Configuración del Frontend
+## 🎨 Configuración del Frontend
 
 ### Estructura del Frontend
 
@@ -528,7 +516,7 @@ localStorage.removeItem('user_data');
 
 -----
 
-## Uso del Sistema
+## 🎮 Uso del Sistema
 
 ### Iniciar el Servidor
 
@@ -550,7 +538,7 @@ gunicorn src.app.main:app \
 **Salida esperada:**
 
 ```
-INFO:     Uvicorn running on [http://127.0.0.1:8000](http://127.0.0.1:8000)
+INFO:     Uvicorn running on http://127.0.0.1:8000
 INFO:     Application startup complete.
 ```
 
@@ -602,7 +590,7 @@ INFO:     Application startup complete.
 
 -----
 
-## API Endpoints
+## 🔌 API Endpoints
 
 ### Autenticación
 
@@ -801,7 +789,7 @@ Obtiene tipos de documento disponibles.
 
 -----
 
-## WebSocket
+## 🔌 WebSocket
 
 ### Conexión
 
@@ -923,7 +911,7 @@ El WebSocket usa mensajes JSON bidireccionales:
 
 -----
 
-## Seguridad
+## 🔒 Seguridad
 
 ### Autenticación JWT
 
@@ -1042,8 +1030,8 @@ app.add_middleware(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "[https://smarthealth.com](https://smarthealth.com)",
-        "[https://app.smarthealth.com](https://app.smarthealth.com)"
+        "https://smarthealth.com",
+        "https://app.smarthealth.com"
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
@@ -1053,7 +1041,7 @@ app.add_middleware(
 
 -----
 
-## Estructura del Proyecto
+## 📁 7. ESTRUCTURA DEL PROYECTO
 
 ```
 BACKEND-FAPI-BDI-SMART_HEALTH/
@@ -1180,7 +1168,7 @@ BACKEND-FAPI-BDI-SMART_HEALTH/
 
 -----
 
-## Tecnologías Utilizadas
+## 🎯 8. TECNOLOGÍAS UTILIZADAS
 
 ### Backend
 
@@ -1226,7 +1214,7 @@ BACKEND-FAPI-BDI-SMART_HEALTH/
 
 -----
 
-## Desarrollo
+## 🔧 9. DESARROLLO
 
 ### Entorno de Desarrollo
 
@@ -1268,7 +1256,7 @@ SECRET_KEY=dev_secret_key_change_in_production_32chars_min
 
 APP_ENV=development
 
-# OpenAI (obtener en [https://platform.openai.com/api-keys](https://platform.openai.com/api-keys))
+# OpenAI (obtener en https://platform.openai.com/api-keys)
 OPENAI_API_KEY=sk-your-api-key-here
 
 # Configuración LLM
@@ -1336,7 +1324,7 @@ uvicorn src.app.main:app --reload --port 8000
 
 -----
 
-## Testing
+## 🧪 10. TESTING
 
 ### Tests de Backend
 
@@ -1386,7 +1374,7 @@ python test_websocket.py
 
 -----
 
-## Despliegue en Producción
+## 🚀 11. DESPLIEGUE EN PRODUCCIÓN
 
 ### Checklist Pre-Deploy
 
@@ -1529,8 +1517,8 @@ server {
     listen 443 ssl http2;
     server_name smarthealth.com;
 
-    ssl_certificate /etc/letsencrypt/live/[smarthealth.com/fullchain.pem](https://smarthealth.com/fullchain.pem);
-    ssl_certificate_key /etc/letsencrypt/live/[smarthealth.com/privkey.pem](https://smarthealth.com/privkey.pem);
+    ssl_certificate /etc/letsencrypt/live/smarthealth.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/smarthealth.com/privkey.pem;
 
     # Headers de seguridad
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
@@ -1539,7 +1527,7 @@ server {
     add_header X-XSS-Protection "1; mode=block" always;
 
     location / {
-        proxy_pass [http://127.0.0.1:8000](http://127.0.0.1:8000);
+        proxy_pass http://127.0.0.1:8000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -1547,7 +1535,7 @@ server {
     }
 
     location /ws/ {
-        proxy_pass [http://127.0.0.1:8000](http://127.0.0.1:8000);
+        proxy_pass http://127.0.0.1:8000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -1594,7 +1582,7 @@ sudo systemctl status smarthealth
 
 -----
 
-## Monitoreo y Logs
+## 📊 12. MONITOREO Y LOGS
 
 ### Logs de Aplicación
 
@@ -1659,7 +1647,7 @@ curl http://localhost:8000/health
 
 -----
 
-## Troubleshooting
+## ⚠️ 13. TROUBLESHOOTING
 
 ### Problemas Comunes
 
@@ -1774,7 +1762,7 @@ tail -f backend/logs/app.log
 
 -----
 
-## Recursos Adicionales
+## 📚 14. RECURSOS ADICIONALES
 
 ### Documentación Oficial
 
@@ -1801,7 +1789,7 @@ tail -f backend/logs/app.log
 
 -----
 
-## Contribución
+## 👥 15. CONTRIBUCIÓN
 
 ### Guía de Contribución
 
@@ -1846,7 +1834,7 @@ tail -f backend/logs/app.log
 
 -----
 
-## Licencia
+## 📄 16. LICENCIA
 
 Este proyecto está bajo la licencia **MIT**.
 
@@ -1876,7 +1864,7 @@ SOFTWARE.
 
 -----
 
-## Agradecimientos
+## 🙏 17. AGRADECIMIENTOS
 
   - **OpenAI** por la API de GPT y embeddings
   - **FastAPI** por el excelente framework
@@ -1885,7 +1873,7 @@ SOFTWARE.
 
 -----
 
-## Contacto
+## 📞 18. CONTACTO
 
 **Equipo de Desarrollo:**
 
@@ -1900,7 +1888,7 @@ SOFTWARE.
 
 -----
 
-## Changelog
+## 🔄 19. CHANGELOG
 
 ### v2.0.0 (2025-12-11)
 
@@ -1919,11 +1907,3 @@ SOFTWARE.
   - ⚡ API REST básica
   - 💾 Base de datos PostgreSQL
   - 🔐 Sistema
-
-<!-- end list -->
-
-```
-```
-
-
-
