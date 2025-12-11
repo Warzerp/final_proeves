@@ -74,7 +74,7 @@ especialista en medicina física y rehabilitación."
 
 -----
 
-## ✨ Características Principales
+##  Características Principales
 
 ### Backend
 
@@ -105,7 +105,7 @@ especialista en medicina física y rehabilitación."
 
 -----
 
-## 🏗️ Arquitectura del Sistema
+##  Arquitectura del Sistema
 
 ### Arquitectura General
 
@@ -209,7 +209,7 @@ especialista en medicina física y rehabilitación."
 
 -----
 
-## 📦 Requisitos del Sistema
+##  Requisitos del Sistema
 
 ### Software Requerido
 
@@ -250,7 +250,7 @@ especialista en medicina física y rehabilitación."
 
 -----
 
-## 🚀 Instalación Rápida
+##  Instalación Rápida
 
 ### Opción 1: Clonar
 
@@ -266,7 +266,7 @@ cd -backend-fapi-bdi-smart_health
 
 -----
 
-## 📚 Instalación Detallada
+##  Instalación Detallada
 
 ### Paso 1: Preparar el Entorno
 
@@ -438,7 +438,7 @@ python -m app.services.generate_embeddings
 
 -----
 
-## 🎨 Configuración del Frontend
+##  Configuración del Frontend
 
 ### Estructura del Frontend
 
@@ -516,7 +516,7 @@ localStorage.removeItem('user_data');
 
 -----
 
-## 🎮 Uso del Sistema
+##  Uso del Sistema
 
 ### Iniciar el Servidor
 
@@ -590,7 +590,7 @@ INFO:     Application startup complete.
 
 -----
 
-## 🔌 API Endpoints
+##  API Endpoints
 
 ### Autenticación
 
@@ -789,7 +789,7 @@ Obtiene tipos de documento disponibles.
 
 -----
 
-## 🔌 WebSocket
+##  WebSocket
 
 ### Conexión
 
@@ -911,7 +911,7 @@ El WebSocket usa mensajes JSON bidireccionales:
 
 -----
 
-## 🔒 Seguridad
+##  Seguridad
 
 ### Autenticación JWT
 
@@ -1041,7 +1041,7 @@ app.add_middleware(
 
 -----
 
-## 📁 7. ESTRUCTURA DEL PROYECTO
+## Estrutura del Proyecto
 
 ```
 BACKEND-FAPI-BDI-SMART_HEALTH/
@@ -1168,7 +1168,7 @@ BACKEND-FAPI-BDI-SMART_HEALTH/
 
 -----
 
-## 🎯 8. TECNOLOGÍAS UTILIZADAS
+##  8 Tecnologías Utilizadas
 
 ### Backend
 
@@ -1214,7 +1214,7 @@ BACKEND-FAPI-BDI-SMART_HEALTH/
 
 -----
 
-## 🔧 9. DESARROLLO
+## Desarrollo
 
 ### Entorno de Desarrollo
 
@@ -1324,7 +1324,7 @@ uvicorn src.app.main:app --reload --port 8000
 
 -----
 
-## 🧪 10. TESTING
+## Testing
 
 ### Tests de Backend
 
@@ -1374,7 +1374,7 @@ python test_websocket.py
 
 -----
 
-## 🚀 11. DESPLIEGUE EN PRODUCCIÓN
+## Despliegue en Porducción
 
 ### Checklist Pre-Deploy
 
@@ -1582,7 +1582,7 @@ sudo systemctl status smarthealth
 
 -----
 
-## 📊 12. MONITOREO Y LOGS
+## Monitoreo y Logs
 
 ### Logs de Aplicación
 
@@ -1647,7 +1647,7 @@ curl http://localhost:8000/health
 
 -----
 
-## ⚠️ 13. TROUBLESHOOTING
+## Troubleshooting
 
 ### Problemas Comunes
 
@@ -1762,7 +1762,7 @@ tail -f backend/logs/app.log
 
 -----
 
-## 📚 14. RECURSOS ADICIONALES
+## Recursos Adicionales
 
 ### Documentación Oficial
 
@@ -1789,7 +1789,7 @@ tail -f backend/logs/app.log
 
 -----
 
-## 👥 15. CONTRIBUCIÓN
+## Contribución
 
 ### Guía de Contribución
 
@@ -1834,7 +1834,7 @@ tail -f backend/logs/app.log
 
 -----
 
-## 📄 16. LICENCIA
+## Licencia
 
 Este proyecto está bajo la licencia **MIT**.
 
