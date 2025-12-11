@@ -25,16 +25,16 @@
 9. [API Endpoints](#api-endpoints)
 10. [WebSocket](#websocket)
 11. [Seguridad](#seguridad)
-12. [Estructura del Proyecto](#7-estructura-del-proyecto)
+12. [Estructura del Proyecto](#estructura-del-proyecto)
 13. [Tecnologías Utilizadas](#8-tecnologías-utilizadas)
-14. [Desarrollo](#9-desarrollo)
-15. [Testing](#10-testing)
-16. [Despliegue en Producción](#11-despliegue-en-producción)
-17. [Monitoreo y Logs](#12-monitoreo-y-logs)
-18. [Troubleshooting](#13-troubleshooting)
-19. [Recursos Adicionales](#14-recursos-adicionales)
-20. [Contribución](#15-contribución)
-21. [Licencia](#16-licencia)
+14. [Desarrollo](#desarrollo)
+15. [Testing](#testing)
+16. [Despliegue en Producción](#despliegue-en-producción)
+17. [Monitoreo y Logs](#monitoreo-y-logs)
+18. [Troubleshooting](#troubleshooting)
+19. [Recursos Adicionales](#recursos-adicionales)
+20. [Contribución](#contribución)
+21. [Licencia](#licencia)
 
 -----
 
@@ -1041,7 +1041,7 @@ app.add_middleware(
 
 -----
 
-## Estrutura del Proyecto
+##  Estructura del Proyecto
 
 ```
 BACKEND-FAPI-BDI-SMART_HEALTH/
@@ -1168,7 +1168,7 @@ BACKEND-FAPI-BDI-SMART_HEALTH/
 
 -----
 
-##  8 Tecnologías Utilizadas
+##  Tecnologías Utilizadas
 
 ### Backend
 
@@ -1214,7 +1214,7 @@ BACKEND-FAPI-BDI-SMART_HEALTH/
 
 -----
 
-## Desarrollo
+##  Desarrollo
 
 ### Entorno de Desarrollo
 
@@ -1324,7 +1324,7 @@ uvicorn src.app.main:app --reload --port 8000
 
 -----
 
-## Testing
+##  Testing
 
 ### Tests de Backend
 
@@ -1374,7 +1374,7 @@ python test_websocket.py
 
 -----
 
-## Despliegue en Porducción
+##  Despliegue en Porducción
 
 ### Checklist Pre-Deploy
 
@@ -1582,7 +1582,7 @@ sudo systemctl status smarthealth
 
 -----
 
-## Monitoreo y Logs
+##  Monitoreo y Logs
 
 ### Logs de Aplicación
 
