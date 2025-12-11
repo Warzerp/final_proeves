@@ -922,5 +922,904 @@ query = f"SELECT * FROM users WHERE email = '{user_email}'"
 
 **Sanitización de número de documento:**
 ```python
-def sanitize_document_number(
+def sanitize_document_number(doc_number: str) -> str:
+    """
+    Sanitiza el número de documento eliminando caracteres peligrosos.
+    Solo permite: letras (A-Z, a-z), números (0-9), guiones (-)
+    """
+    # Eliminar espacios
+    doc_number = doc_number.strip()
+    
+    # Solo permitir caracteres seguros
+    sanitized = re.sub(r'[^A-Za-z0-9\-]', '', doc_number)
+    
+    # Limitar longitud máxima
+    if len(sanitized) > 50:
+        sanitized = sanitized[:50]
+    
+    return sanitized
+```
 
+**Validación de queries:**
+```python
+def validate_query_input(input_data: QueryInput) -> tuple[bool, Optional[str]]:
+    """
+    Valida los datos de entrada para prevenir inyecciones.
+    
+    Returns:
+        (is_valid, error_message)
+    """
+    # Validar document_type_id
+    valid_doc_types = [1, 2, 3, 4, 5, 6, 7, 8]
+    if input_data.document_type_id not in valid_doc_types:
+        return False, f"Tipo de documento inválido: {input_data.document_type_id}"
+    
+    # Validar pregunta
+    if len(input_data.question) > 1000:
+        return False, "La pregunta no puede exceder 1000 caracteres"
+    
+    # Detectar intentos de inyección SQL
+    dangerous_patterns = [
+        r"(\bOR\b.*=.*)",
+        r"(DROP\s+TABLE)",
+        r"(DELETE\s+FROM)",
+        r"(--\s*$)",
+    ]
+    
+    combined_input = f"{input_data.document_number} {input_data.question}"
+    for pattern in dangerous_patterns:
+        if re.search(pattern, combined_input, re.IGNORECASE):
+            return False, "Query contiene patrones potencialmente peligrosos"
+    
+    return True, None
+```
+
+### Protección CORS
+
+**Desarrollo:**
+```python
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Permitir todos
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
+**Producción:**
+```python
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://smarthealth.com",
+        "https://app.smarthealth.com"
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["*"],
+)
+```
+
+---
+
+## 📁 7. ESTRUCTURA DEL PROYECTO
+
+```
+BACKEND-FAPI-BDI-SMART_HEALTH/
+│
+├── backend/                          # Backend FastAPI
+│   ├── src/
+│   │   └── app/
+│   │       ├── __init__.py
+│   │       ├── main.py              # Punto de entrada FastAPI
+│   │       │
+│   │       ├── core/                # Configuración central
+│   │       │   ├── __init__.py
+│   │       │   └── security.py      # JWT, bcrypt, dependencies
+│   │       │
+│   │       ├── database/            # Base de datos
+│   │       │   ├── __init__.py
+│   │       │   ├── database.py      # Engine SQLAlchemy
+│   │       │   └── db_config.py     # Settings Pydantic
+│   │       │
+│   │       ├── models/              # Modelos SQLAlchemy
+│   │       │   ├── __init__.py
+│   │       │   ├── user.py
+│   │       │   ├── patient.py
+│   │       │   ├── appointment.py
+│   │       │   ├── medical_record.py
+│   │       │   ├── diagnosis.py
+│   │       │   ├── prescription.py
+│   │       │   ├── record_diagnosis.py
+│   │       │   └── audit_logs.py
+│   │       │
+│   │       ├── schemas/             # Schemas Pydantic
+│   │       │   ├── __init__.py
+│   │       │   ├── user.py
+│   │       │   ├── clinical.py      # DTOs clínicos
+│   │       │   ├── rag.py           # SimilarChunk
+│   │       │   ├── llm_schemas.py
+│   │       │   ├── catalog.py
+│   │       │   └── audit_logs.py
+│   │       │
+│   │       ├── routers/             # Endpoints API
+│   │       │   ├── __init__.py
+│   │       │   ├── auth.py          # /auth/register, /auth/login
+│   │       │   ├── user.py          # /users/me, CRUD users
+│   │       │   ├── query.py         # /query/ (RAG endpoint)
+│   │       │   ├── websocket_chat.py # /ws/chat
+│   │       │   ├── history.py       # /history/
+│   │       │   └── catalog.py       # /catalog/document-types
+│   │       │
+│   │       └── services/            # Lógica de negocio
+│   │           ├── __init__.py
+│   │           ├── auth_service.py  # Registro, login
+│   │           ├── auth_utils.py    # Verify token (WebSocket)
+│   │           ├── user.py          # CRUD usuarios
+│   │           ├── clinical_service.py # P2: Fetch datos clínicos
+│   │           ├── vector_search.py    # P3: Búsqueda vectorial
+│   │           ├── llm_client.py       # Cliente OpenAI
+│   │           ├── llm_service.py      # LLM Service
+│   │           ├── rag_context.py      # P4: Build context, sources
+│   │           └── generate_embeddings.py # Script de embeddings
+│   │
+│   ├── requirements.txt              # Dependencias Python
+│   ├── start_server.py              # Script de inicio
+│   ├── test_db_connection.py        # Test de conexión
+│   ├── test_llm_real.py             # Test LLM
+│   ├── test_security.py             # Suite de seguridad
+│   ├── remove_emojis.py             # Script de limpieza
+│   │
+│   ├── database_setup.md            # Guía de instalación DB
+│   ├── security.md                  # Guía de seguridad
+│   └── README.md                    # Este archivo
+│
+├── frontend/                         # Frontend Vanilla JS
+│   ├── public/                      # Archivos HTML
+│   │   ├── index.html              # Chat (requiere auth)
+│   │   ├── login.html              # Login
+│   │   ├── register.html           # Registro
+│   │   ├── test.html               # Tests
+│   │   └── unauthorized.html       # No autorizado
+│   │
+│   ├── static/                      # Assets estáticos
+│   │   ├── css/
+│   │   │   ├── base.css           # Estilos base
+│   │   │   ├── animations.css     # Animaciones
+│   │   │   ├── chat.css           # Chat UI
+│   │   │   └── test.css           # Tests
+│   │   │
+│   │   ├── js/
+│   │   │   ├── utils.js           # Storage, API, Auth, Utils
+│   │   │   ├── auth.js            # Login/Register
+│   │   │   ├── chat.js            # Lógica del chat
+│   │   │   ├── route-protection.js # Protección de rutas
+│   │   │   └── test.js            # Suite de tests
+│   │   │
+│   │   └── img/
+│   │       └── Logo, Png.png      # Logo SmartHealth
+│   │
+│   ├── docs/
+│   │   └── websocket.md            # Protocolo WebSocket
+│   │
+│   ├── scripts/
+│   │   ├── setup_websocket.bat    # Setup Windows
+│   │   └── test_websocket.py      # Test WebSocket
+│   │
+│   └── server.py                   # Servidor HTTP simple (dev)
+│
+├── pipelines/                       # Scripts de base de datos
+│   ├── 01-create-database/
+│   │   ├── script-01.py           # Crear DB y usuario
+│   │   └── script-02.py           # Instalar pgvector
+│   │
+│   └── 02-insert-data/
+│       ├── create-tables.py       # Crear esquema y tablas
+│       └── script-02.py           # Insertar datos de ejemplo
+│
+├── docs/                            # Documentación adicional
+│   ├── AUTENTICACION.md            # Sistema de autenticación
+│   ├── interface.md                # Interfaces P4
+│   └── p4_interface.md             # Funciones P4
+│
+├── .env                             # Variables de entorno (NO COMMITEAR)
+├── .gitignore
+└── README.md                        # Este archivo
+```
+
+---
+
+## 🎯 8. TECNOLOGÍAS UTILIZADAS
+
+### Backend
+
+| Tecnología | Versión | Propósito |
+|------------|---------|-----------|
+| **Python** | 3.9+ | Lenguaje principal |
+| **FastAPI** | 0.111.0 | Framework web |
+| **Uvicorn** | 0.30.1 | Servidor ASGI |
+| **SQLAlchemy** | 2.0.29 | ORM para PostgreSQL |
+| **Pydantic** | 2.8.0 | Validación de datos |
+| **psycopg2-binary** | 2.9.9 | Driver PostgreSQL |
+| **pgvector** | 0.4.1 | Extensión para vectores |
+| **OpenAI** | 1.12.0+ | API para GPT y embeddings |
+| **python-jose** | 3.3.0 | JWT tokens |
+| **passlib[bcrypt]** | 1.7.4 | Hashing de contraseñas |
+| **websockets** | 12.0+ | WebSocket support |
+| **python-dotenv** | 1.0.1 | Variables de entorno |
+
+### Frontend
+
+| Tecnología | Versión | Propósito |
+|------------|---------|-----------|
+| **Vanilla JavaScript** | ES6+ | Lógica del frontend |
+| **HTML5** | - | Estructura |
+| **CSS3** | - | Estilos (custom) |
+| **WebSocket API** | - | Chat en tiempo real |
+| **Fetch API** | - | Llamadas HTTP |
+| **LocalStorage API** | - | Almacenamiento local |
+
+### Base de Datos
+
+| Tecnología | Versión | Propósito |
+|------------|---------|-----------|
+| **PostgreSQL** | 16+ | Base de datos principal |
+| **pgvector** | 0.5.1+ | Búsqueda vectorial |
+
+### Servicios Externos
+
+| Servicio | Modelo | Propósito |
+|----------|--------|-----------|
+| **OpenAI GPT** | gpt-4o-mini | Generación de respuestas |
+| **OpenAI Embeddings** | text-embedding-3-small | Embeddings vectoriales |
+
+---
+
+## 🔧 9. DESARROLLO
+
+### Entorno de Desarrollo
+
+**Backend:**
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# o
+venv\Scripts\activate  # Windows
+
+pip install -r requirements.txt
+```
+
+**Frontend:**
+```bash
+# No requiere instalación
+# Solo abrir en navegador o usar servidor HTTP simple
+cd frontend
+python server.py
+```
+
+### Variables de Entorno de Desarrollo
+
+Crear archivo `.env` en la raíz:
+
+```env
+# Desarrollo
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=smarthdb
+DB_USER=sm_admin
+DB_PASSWORD=sm2025
+
+# Generar con: python -c "import secrets; print(secrets.token_hex(32))"
+SECRET_KEY=dev_secret_key_change_in_production_32chars_min
+
+APP_ENV=development
+
+# OpenAI (obtener en https://platform.openai.com/api-keys)
+OPENAI_API_KEY=sk-your-api-key-here
+
+# Configuración LLM
+LLM_MODEL=gpt-4o-mini
+LLM_TEMPERATURE=0.1
+LLM_MAX_TOKENS=2000
+LLM_TIMEOUT=30
+```
+
+### Ejecutar en Desarrollo
+
+**Backend:**
+```bash
+cd backend
+python start_server.py
+# o
+uvicorn src.app.main:app --reload --port 8000
+```
+
+**Acceder:**
+- Frontend: http://localhost:8000/chat
+- API Docs: http://localhost:8000/docs
+- Health: http://localhost:8000/health
+
+### Hot Reload
+
+- **Backend**: Uvicorn con `--reload` detecta cambios automáticamente
+- **Frontend**: Solo refrescar el navegador (Ctrl+R)
+
+### Debugging
+
+**VSCode (Backend):**
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: FastAPI",
+            "type": "python",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "src.app.main:app",
+                "--reload",
+                "--port",
+                "8000"
+            ],
+            "cwd": "${workspaceFolder}/backend",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/backend/src"
+            }
+        }
+    ]
+}
+```
+
+**Browser DevTools (Frontend):**
+- Chrome: F12 → Console/Network
+- Firefox: F12 → Console/Network
+- Safari: Cmd+Opt+I → Console/Network
+
+---
+
+## 🧪 10. TESTING
+
+### Tests de Backend
+
+**Test de Conexión a Base de Datos:**
+```bash
+cd backend
+python test_db_connection.py
+```
+
+**Test de Seguridad:**
+```bash
+python test_security.py
+```
+
+**Test de LLM:**
+```bash
+python test_llm_real.py
+```
+
+### Tests de Frontend
+
+Abrir en navegador:
+```
+http://localhost:8000/public/test.html
+```
+
+### Tests Manuales
+
+**Flujo Completo:**
+1. Registro: http://localhost:8000/register
+2. Login: http://localhost:8000/login
+3. Chat: http://localhost:8000/chat
+4. Realizar consulta
+5. Verificar respuesta
+
+**Verificar WebSocket:**
+```bash
+cd frontend/scripts
+python test_websocket.py
+```
+
+---
+
+## 🚀 11. DESPLIEGUE EN PRODUCCIÓN
+
+### Checklist Pre-Deploy
+
+#### Configuración
+
+- [ ] `SECRET_KEY` única y segura (64+ caracteres)
+- [ ] `APP_ENV=production`
+- [ ] HTTPS/TLS configurado
+- [ ] CORS restrictivo (solo dominios permitidos)
+- [ ] Rate limiting habilitado
+- [ ] Variables de entorno seguras
+- [ ] API Docs deshabilitada (`/docs`, `/redoc`)
+- [ ] Logs configurados
+
+#### Base de Datos
+
+- [ ] Contraseña fuerte de PostgreSQL
+- [ ] Firewall configurado (solo IPs específicas)
+- [ ] Backups automáticos configurados
+- [ ] Encriptación habilitada
+- [ ] pgvector instalado
+
+#### Seguridad
+
+- [ ] Certificado SSL/TLS válido
+- [ ] Headers de seguridad habilitados
+- [ ] JWT con SECRET_KEY única
+- [ ] Contraseñas hasheadas (bcrypt)
+- [ ] Rate limiting configurado
+- [ ] SQL injection protegido
+- [ ] XSS protegido
+
+### Despliegue con Gunicorn
+
+**Instalar Gunicorn:**
+```bash
+pip install gunicorn
+```
+
+**Ejecutar:**
+```bash
+gunicorn src.app.main:app \
+  -w 4 \
+  -k uvicorn.workers.UvicornWorker \
+  --bind 0.0.0.0:8000 \
+  --access-logfile access.log \
+  --error-logfile error.log \
+  --log-level info
+```
+
+### Despliegue con Docker
+
+**Dockerfile:**
+```dockerfile
+FROM python:3.9-slim
+
+# Variables de entorno
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Crear usuario no privilegiado
+RUN useradd -m -u 1000 appuser
+
+WORKDIR /app
+
+# Instalar dependencias del sistema
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copiar requirements e instalar
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copiar código
+COPY src/ ./src/
+
+# Cambiar a usuario no privilegiado
+USER appuser
+
+# Puerto
+EXPOSE 8000
+
+# Comando de inicio
+CMD ["gunicorn", "src.app.main:app", \
+     "-w", "4", \
+     "-k", "uvicorn.workers.UvicornWorker", \
+     "--bind", "0.0.0.0:8000"]
+```
+
+**docker-compose.yml:**
+```yaml
+version: '3.8'
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: smarthdb
+      POSTGRES_USER: sm_admin
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
+    restart: unless-stopped
+
+  api:
+    build: ./backend
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      - db
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  postgres_data:
+```
+
+**Ejecutar:**
+```bash
+docker-compose up -d
+```
+
+### Nginx como Reverse Proxy
+
+**nginx.conf:**
+```nginx
+server {
+    listen 80;
+    server_name smarthealth.com;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name smarthealth.com;
+
+    ssl_certificate /etc/letsencrypt/live/smarthealth.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/smarthealth.com/privkey.pem;
+
+    # Headers de seguridad
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /ws/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+### Systemd Service
+
+**smarthealth.service:**
+```ini
+[Unit]
+Description=SmartHealth API
+After=network.target postgresql.service
+
+[Service]
+Type=notify
+User=appuser
+Group=appuser
+WorkingDirectory=/opt/smarthealth/backend
+Environment="PATH=/opt/smarthealth/venv/bin"
+ExecStart=/opt/smarthealth/venv/bin/gunicorn src.app.main:app \
+    -w 4 \
+    -k uvicorn.workers.UvicornWorker \
+    --bind 0.0.0.0:8000
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**Activar:**
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable smarthealth
+sudo systemctl start smarthealth
+sudo systemctl status smarthealth
+```
+
+---
+
+## 📊 12. MONITOREO Y LOGS
+
+### Logs de Aplicación
+
+**Ubicación:**
+- Backend: `backend/logs/app.log`
+- Gunicorn: `access.log`, `error.log`
+
+**Formato:**
+```
+2025-12-11 10:30:45 - app.services.auth_service - INFO - Login exitoso: user@example.com
+```
+
+### Monitoreo de Base de Datos
+
+**Verificar conexiones:**
+```sql
+SELECT count(*) FROM pg_stat_activity WHERE datname = 'smarthdb';
+```
+
+**Verificar tamaño:**
+```sql
+SELECT pg_size_pretty(pg_database_size('smarthdb'));
+```
+
+**Verificar tablas más grandes:**
+```sql
+SELECT
+    schemaname,
+    tablename,
+    pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) AS size
+FROM pg_tables
+WHERE schemaname = 'smart_health'
+ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
+```
+
+### Health Check
+
+```bash
+curl http://localhost:8000/health
+```
+
+**Respuesta esperada:**
+```json
+{
+    "status": "healthy",
+    "timestamp": 1733918400.0,
+    "environment": "production",
+    "services": {
+        "database": "connected",
+        "llm": "ready",
+        "vector_search": "ready",
+        "websocket": "enabled"
+    }
+}
+```
+
+---
+
+## ⚠️ 13. TROUBLESHOOTING
+
+### Problemas Comunes
+
+#### Error: "No se puede conectar a PostgreSQL"
+
+**Síntomas:**
+```
+psycopg2.OperationalError: could not connect to server
+```
+
+**Solución:**
+1. Verificar que PostgreSQL esté corriendo:
+   ```bash
+   sudo systemctl status postgresql
+   ```
+2. Verificar puerto y host en `.env`
+3. Verificar firewall:
+   ```bash
+   sudo ufw allow 5432/tcp
+   ```
+
+#### Error: "Token JWT inválido"
+
+**Síntomas:**
+```
+401 Unauthorized: No se pudieron validar las credenciales
+```
+
+**Solución:**
+1. Verificar que `SECRET_KEY` sea la misma en todos los entornos
+2. Verificar que el token no haya expirado (30 min)
+3. Limpiar localStorage del navegador:
+   ```javascript
+   localStorage.clear()
+   ```
+
+#### Error: "OpenAI API rate limit"
+
+**Síntomas:**
+```
+openai.error.RateLimitError: You exceeded your current quota
+```
+
+**Solución:**
+1. Verificar créditos en https://platform.openai.com/account/usage
+2. Reducir `LLM_MAX_TOKENS` en `.env`
+3. Implementar caché de respuestas
+
+#### Error: "pgvector extension not found"
+
+**Síntomas:**
+```
+psycopg2.errors.UndefinedObject: type "vector" does not exist
+```
+
+**Solución:**
+1. Instalar pgvector:
+   ```bash
+   cd pipelines/01-create-database
+   python script-02.py
+   ```
+2. Verificar instalación:
+   ```sql
+   \dx
+   ```
+
+#### Error: "CORS policy blocked"
+
+**Síntomas:**
+```
+Access to fetch at 'http://localhost:8000' from origin 'http://localhost:3000' 
+has been blocked by CORS policy
+```
+
+**Solución:**
+1. Verificar configuración de CORS en `main.py`
+2. Agregar origen permitido en `CORS_ORIGINS` del `.env`
+3. En desarrollo, usar `allow_origins=["*"]`
+
+### Logs de Debugging
+
+**Habilitar logs detallados:**
+```python
+import logging
+logging.basicConfig(level=logging.DEBUG)
+```
+
+**Ver logs en tiempo real:**
+```bash
+tail -f backend/logs/app.log
+```
+
+---
+
+## 📚 14. RECURSOS ADICIONALES
+
+### Documentación Oficial
+
+- **FastAPI**: https://fastapi.tiangolo.com/
+- **SQLAlchemy**: https://docs.sqlalchemy.org/
+- **Pydantic**: https://docs.pydantic.dev/
+- **PostgreSQL**: https://www.postgresql.org/docs/
+- **pgvector**: https://github.com/pgvector/pgvector
+- **OpenAI API**: https://platform.openai.com/docs/
+
+### Tutoriales y Guías
+
+- [FastAPI Tutorial](https://fastapi.tiangolo.com/tutorial/)
+- [SQLAlchemy ORM Tutorial](https://docs.sqlalchemy.org/en/20/tutorial/)
+- [pgvector Guide](https://github.com/pgvector/pgvector#installation)
+- [JWT Authentication](https://fastapi.tiangolo.com/tutorial/security/)
+
+### Herramientas Útiles
+
+- **Postman**: Testing de API REST
+- **WebSocket King**: Testing de WebSocket
+- **pgAdmin**: Administración de PostgreSQL
+- **Docker Desktop**: Contenedores
+
+---
+
+## 👥 15. CONTRIBUCIÓN
+
+### Guía de Contribución
+
+1. **Fork** el repositorio
+2. Crear una **branch** para tu feature:
+   ```bash
+   git checkout -b feature/nueva-funcionalidad
+   ```
+3. **Commit** tus cambios:
+   ```bash
+   git commit -m "feat: agregar nueva funcionalidad"
+   ```
+4. **Push** a tu branch:
+   ```bash
+   git push origin feature/nueva-funcionalidad
+   ```
+5. Abrir un **Pull Request**
+
+### Convenciones de Código
+
+**Python:**
+- Seguir PEP 8
+- Docstrings en todas las funciones
+- Type hints siempre que sea posible
+- Nombres descriptivos
+
+**JavaScript:**
+- Camel case para variables y funciones
+- Pascal case para clases
+- Comentarios JSDoc
+
+**Git Commits:**
+- `feat:` nueva funcionalidad
+- `fix:` corrección de bug
+- `docs:` documentación
+- `refactor:` refactorización
+- `test:` tests
+- `chore:` tareas de mantenimiento
+
+---
+
+## 📄 16. LICENCIA
+
+Este proyecto está bajo la licencia **MIT**.
+
+```
+MIT License
+
+Copyright (c) 2025 SmartHealth Team
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+---
+
+## 🙏 17. AGRADECIMIENTOS
+
+- **OpenAI** por la API de GPT y embeddings
+- **FastAPI** por el excelente framework
+- **pgvector** por la extensión de vectores para PostgreSQL
+- **Comunidad Open Source** por las librerías utilizadas
+
+---
+
+## 📞 18. CONTACTO
+
+**Equipo de Desarrollo:**
+- Ivan Ospino
+- Gisell Anaya
+- Jhoan Smith
+- Jeison Mendez
+- Jhon Mantilla
+
+**Repositorio:**
+https://github.com/Ospino89/-backend-fapi-bdi-smart_health
+
+---
+
+## 🔄 19. CHANGELOG
+
+### v2.0.0 (2025-12-11)
+- ✨ Sistema RAG completo implementado
+- ✨ WebSocket para streaming en tiempo real
+- ✨ Autenticación JWT
+- ✨ Frontend Vanilla JS responsive
+- ✨ Búsqueda vectorial con pgvector
+- ✨ Integración con OpenAI GPT-4o-mini
+- 🐛 Correcciones de seguridad
+- 📝 Documentación completa
+
+### v1.0.0 (2025-11-22)
+- 🎉 Release inicial
+- ⚡ API REST básica
+- 💾 Base de datos PostgreSQL
+- 🔐 Sistema
