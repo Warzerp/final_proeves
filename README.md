@@ -4,7 +4,7 @@
 **Desarrolladores**: Ivan Ospino, Gisell Anaya, Jhoan Smith, Jeison Mendez, Jhon Mantilla  
 **Versión**: 2.0.0 Final  
 **Creado**: 22-Noviembre-2025  
-**Última actualización**: 11-Diciembre-2025
+**Última actualización**: 10-Diciembre-2025
 
 ---
 
@@ -1823,3 +1823,4 @@ https://github.com/Ospino89/-backend-fapi-bdi-smart_health
 - ⚡ API REST básica
 - 💾 Base de datos PostgreSQL
 - 🔐 Sistema
+
