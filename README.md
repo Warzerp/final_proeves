@@ -1,6 +1,3 @@
-Aquí tienes el `README.md` actualizado con todas las correcciones y notas solicitadas integradas en las secciones correspondientes.
-
------
 
 # BACKEND-FAPI-BDI-SMART\_HEALTH
 
@@ -1908,3 +1905,4 @@ SOFTWARE.
   - ⚡ API REST básica
   - 💾 Base de datos PostgreSQL
   - 🔐 Sistema
+
