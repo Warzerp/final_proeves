@@ -26,7 +26,7 @@
 10. [WebSocket](#websocket)
 11. [Seguridad](#seguridad)
 12. [Estructura del Proyecto](#estructura-del-proyecto)
-13. [Tecnologías Utilizadas](#8-tecnologías-utilizadas)
+13. [Tecnologías Utilizadas](#tecnologías-utilizadas)
 14. [Desarrollo](#desarrollo)
 15. [Testing](#testing)
 16. [Despliegue en Producción](#despliegue-en-producción)
@@ -1374,7 +1374,7 @@ python test_websocket.py
 
 -----
 
-##  Despliegue en Porducción
+##  Despliegue en Producción
 
 ### Checklist Pre-Deploy
 
